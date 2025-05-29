@@ -12,7 +12,7 @@ object RetrofitClient {
     private val httpClient: OkHttpClient
         get(){
             val clientBuilder = OkHttpClient.Builder()
-            val token = ""
+            val token = BuildConfig.API_KEY
 
             clientBuilder.addInterceptor { chain ->
                 val original : Request = chain.request()
@@ -30,3 +30,4 @@ object RetrofitClient {
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 }
+
