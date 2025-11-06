@@ -13,6 +13,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -37,25 +38,27 @@ fun MovieDetailScreen(
 ) {
     var movieDto by remember { mutableStateOf<MovieDto?>(null) }
 
-    val apiService = RetrofitClient.retrofitInstance.create(ApiService::class.java)
-    apiService.getMovieById(movieId).enqueue(
-        object : Callback<MovieDto>{
-            override fun onResponse(call: Call<MovieDto?>, response: Response<MovieDto?>) {
-                if (response.isSuccessful) {
-                    movieDto = response.body()
+    LaunchedEffect(Unit) {
+        val apiService = RetrofitClient.retrofitInstance.create(ApiService::class.java)
+        apiService.getMovieById(movieId).enqueue(
+            object : Callback<MovieDto>{
+                override fun onResponse(call: Call<MovieDto?>, response: Response<MovieDto?>) {
+                    if (response.isSuccessful) {
+                        movieDto = response.body()
 
-                } else {
-                    Log.d(
-                        "MainActivity",
-                        "Response Error :: ${response.errorBody()?.string()}"
-                    )
+                    } else {
+                        Log.d(
+                            "MainActivity",
+                            "Response Error :: ${response.errorBody()?.string()}"
+                        )
+                    }
+                }
+                override fun onFailure(call: Call<MovieDto?>, t: Throwable) {
+                    Log.d("MainActivity", "Network Error :: ${t.message}")
                 }
             }
-            override fun onFailure(call: Call<MovieDto?>, t: Throwable) {
-                Log.d("MainActivity", "Network Error :: ${t.message}")
-            }
-        }
-    )
+        )
+    }
     movieDto?.let{
         Column(
             modifier = Modifier.fillMaxSize()
@@ -118,4 +121,3 @@ private fun MovieDetailPreview(){
         MovieDetailContent(movie = movie)
     }
 }
-
